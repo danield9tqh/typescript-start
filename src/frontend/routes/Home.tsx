@@ -1,5 +1,8 @@
+import { App } from "@/backend/server";
+import { hc } from "hono/client";
 import { useState } from "react";
-import { client } from "../client";
+
+const client = hc<App>("/api");
 
 export function Home() {
     const [name, setName] = useState("");
