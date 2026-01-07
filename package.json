@@ -1,5 +1,5 @@
 {
-  "name": "bun-app",
+  "name": "bun-starter-app",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -7,10 +7,18 @@
   "module": "src/index.tsx",
   "scripts": {
     "dev": "bun --hot dev.tsx",
-    "deploy": "cd infra && wrangler deploy"
+    "deploy": "cd infra && bun deploy.ts"
   },
   "dependencies": {
+    "@better-auth/passkey": "^1.4.10",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/material": "^7.3.6",
     "@tanstack/react-router": "^1.142.8",
+    "better-auth": "^1.4.10",
+    "better-sqlite3": "^12.5.0",
+    "cloudflare": "^5.2.0",
+    "drizzle-orm": "^0.45.1",
     "hono": "^4.11.1",
     "lucide-react": "^0.562.0",
     "react": "^19",
@@ -18,10 +26,13 @@
     "zod": "^4.2.1"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260107.1",
     "@hono/zod-validator": "^0.7.6",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/bun": "latest",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "drizzle-kit": "^0.31.8",
     "wrangler": "^4.54.0"
   }
 }
