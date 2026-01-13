@@ -2,9 +2,14 @@ import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { createAuth } from "auth/auth";
+import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
+import type * as schema from "../auth/db-schema";
+
+export type DrizzleDb = BaseSQLiteDatabase<"async" | "sync", unknown, typeof schema>;
 
 export interface Env {
   Variables: {
+    db: DrizzleDb;
     auth: ReturnType<typeof createAuth>;
   };
 }

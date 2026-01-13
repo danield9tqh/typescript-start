@@ -31,7 +31,7 @@ await Bun.build({
 
 // Generate migrations from schema
 console.log("🔄 Generating migrations from schema...");
-await $`drizzle-kit generate --dialect=sqlite --schema=${join(rootDir, "auth/db-schema.ts")} --out=${join(infraDir, "migrations")}`;
+await $`drizzle-kit generate --dialect=sqlite --schema=./auth/db-schema.ts --out=./infra/migrations`.cwd(rootDir);
 
 // Create D1 Database with migrations
 const db = await D1Database("db", {

@@ -17,7 +17,7 @@ interface Env {
 
 const app = new Hono<Env>();
 
-// Middleware to set up auth with D1 database
+// Middleware to set up auth and db with D1 database
 app.use("/api/*", async (c, next) => {
     const url = new URL(c.req.url);
     const db = drizzle(c.env.DB, { schema });
@@ -28,6 +28,7 @@ app.use("/api/*", async (c, next) => {
         origin: url.origin,
         secret: c.env.BETTER_AUTH_SECRET,
     });
+    c.set("db", db);
     c.set("auth", auth);
     await next();
 });

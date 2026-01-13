@@ -29,10 +29,13 @@ const auth = createAuth({
   origin: "http://localhost:3000",
 });
 
-const api = new Hono<Env>().use(async (c, next) => {
-  c.set("auth", auth);
-  await next();
-}).route("/api", backend);
+const api = new Hono<Env>()
+  .use(async (c, next) => {
+    c.set("db", db);
+    c.set("auth", auth);
+    await next();
+  })
+  .route("/api", backend);
 
 const server = serve({
   routes: {
