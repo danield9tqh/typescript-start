@@ -12,7 +12,7 @@ Run `bun install` and `bun dev` to start dev.
 
 1. Have a cloudflare account with a domain name managed by cloudflare
 2. Create an alchemy profile. `bunx alchemy configure`
-3. Login with cloudflare `bunx alchemy login`
+3. Login with cloudflare `bunx alchemy login cloudflare`
 4. Set `ALCHEMY_PASSWORD` and `CUSTOM_DOMAIN` in .env
 5. Run `bun run deploy`
 
