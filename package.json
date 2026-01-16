@@ -7,7 +7,7 @@
   "module": "src/index.tsx",
   "scripts": {
     "dev": "bun --hot dev.tsx",
-    "deploy": "cd infra && bun deploy.ts"
+    "deploy": "bun run infra/deploy.ts"
   },
   "dependencies": {
     "@better-auth/passkey": "^1.4.10",
