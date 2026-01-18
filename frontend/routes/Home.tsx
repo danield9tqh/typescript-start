@@ -3,7 +3,7 @@ import { hc } from "hono/client";
 import { useState } from "react";
 import { CornerDownLeft } from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import { colors, shadows } from "../styles";
+import { colors, fontFamily, fontFamilyMono } from "../styles";
 
 const client = hc<App>("/api");
 
@@ -48,20 +48,22 @@ export function Home() {
         flexDirection: "column",
         alignItems: "center",
         minHeight: "100vh",
-        background: colors.background,
+        backgroundColor: colors.background,
         position: "relative",
+        fontFamily,
       }}
     >
       <Link
         to="/login"
         style={{
           position: "absolute",
-          top: "24px",
-          right: "24px",
+          top: 24,
+          right: 24,
           color: colors.textPrimary,
           textDecoration: "none",
-          fontSize: "16px",
+          fontSize: 16,
           fontWeight: 500,
+          fontFamily,
         }}
       >
         Login
@@ -71,8 +73,8 @@ export function Home() {
           marginTop: "40vh",
           display: "flex",
           alignItems: "baseline",
-          gap: "10px",
-          fontSize: "48px",
+          gap: 8,
+          fontSize: 48,
           fontWeight: "bold",
           color: colors.primary,
         }}
@@ -85,18 +87,18 @@ export function Home() {
           onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
           autoFocus
           style={{
-            fontSize: "48px",
+            fontSize: 48,
             fontWeight: "bold",
             color: colors.textPrimary,
             caretColor: "black",
-            caretShape: "block",
             border: "none",
             outline: "none",
             background: "transparent",
-            width: "200px",
+            width: 200,
             textAlign: "left",
-            padding: "0",
-            margin: "0",
+            padding: 0,
+            margin: 0,
+            fontFamily,
           }}
         />
         {name.trim() && (
@@ -107,7 +109,7 @@ export function Home() {
               background: "none",
               border: "none",
               cursor: loading ? "not-allowed" : "pointer",
-              padding: "0",
+              padding: 0,
               display: "flex",
               alignItems: "center",
               opacity: loading ? 0.5 : 1,
@@ -120,31 +122,24 @@ export function Home() {
       {response && (
         <div
           style={{
-            marginTop: "40px",
-            padding: "18px 26px",
-            background: colors.darkSurface,
-            borderRadius: "9px",
-            boxShadow: shadows.card,
+            marginTop: 40,
+            paddingLeft: 24,
+            paddingRight: 24,
+            paddingTop: 16,
+            paddingBottom: 16,
+            backgroundColor: colors.darkSurface,
+            borderRadius: 8,
+            boxShadow: "0 4px 13px rgba(0,0,0,0.1)",
             display: "flex",
             alignItems: "center",
-            gap: "18px",
-            fontFamily: "'SF Mono', 'Fira Code', 'Consolas', monospace",
+            gap: 16,
+            fontFamily: fontFamilyMono,
           }}
         >
-          <span
-            style={{
-              color: colors.textMuted,
-              fontSize: "15px",
-            }}
-          >
+          <span style={{ color: colors.textMuted, fontSize: 15 }}>
             POST /api/hello
           </span>
-          <span
-            style={{
-              color: colors.darkText,
-              fontSize: "15px",
-            }}
-          >
+          <span style={{ color: colors.darkText, fontSize: 15 }}>
             {response}
           </span>
         </div>

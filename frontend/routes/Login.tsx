@@ -1,22 +1,10 @@
-import { useState } from "react";
-import {
-  Box,
-  Button,
-  TextField,
-  Typography,
-  CircularProgress,
-  Divider,
-  Alert,
-  Paper,
-  Container,
-  Stack,
-  ThemeProvider,
-} from "@mui/material";
+import { useState, type CSSProperties } from "react";
+import { Input } from "@base-ui-components/react/input";
 import { Fingerprint, LogOut, Check } from "lucide-react";
 import { anonymousClient } from "better-auth/client/plugins";
 import { passkeyClient } from "@better-auth/passkey/client";
 import { createAuthClient } from "better-auth/react";
-import { theme, colors } from "../styles";
+import { colors, fontFamily, pageContainer, card } from "../styles";
 
 const authClient = createAuthClient({
   baseURL: `${window.location.origin}/api/auth`,
@@ -25,11 +13,82 @@ const authClient = createAuthClient({
 
 type Step = "name" | "creating" | "done";
 
+// Component-specific styles
+const inputStyle: CSSProperties = {
+  width: "100%",
+  padding: "12px 16px",
+  fontSize: 16,
+  fontFamily,
+  border: `2px solid #ddd`,
+  borderRadius: 8,
+  outline: "none",
+  boxSizing: "border-box",
+};
+
+
+const buttonBase: CSSProperties = {
+  width: "100%",
+  padding: "12px 20px",
+  fontSize: 16,
+  fontWeight: 500,
+  fontFamily,
+  borderRadius: 8,
+  cursor: "pointer",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 8,
+  border: "none",
+  transition: "opacity 0.15s",
+};
+
+const primaryButton: CSSProperties = {
+  ...buttonBase,
+  backgroundColor: colors.primary,
+  color: "#ffffff",
+};
+
+const secondaryButton: CSSProperties = {
+  ...buttonBase,
+  backgroundColor: "transparent",
+  color: colors.textPrimary,
+  border: `2px solid ${colors.textPrimary}`,
+};
+
+const successCircle: CSSProperties = {
+  width: 64,
+  height: 64,
+  borderRadius: "50%",
+  backgroundColor: `${colors.success}20`,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+};
+
+const spinner: CSSProperties = {
+  width: 40,
+  height: 40,
+  border: `3px solid ${colors.background}`,
+  borderTopColor: colors.primary,
+  borderRadius: "50%",
+  animation: "spin 1s linear infinite",
+};
+
+const alertError: CSSProperties = {
+  padding: "12px 16px",
+  backgroundColor: `${colors.error}15`,
+  color: colors.error,
+  borderRadius: 8,
+  fontSize: 14,
+  marginBottom: 16,
+};
+
 export function Login() {
   const { data: session, isPending } = authClient.useSession();
   const [name, setName] = useState("");
   const [step, setStep] = useState<Step>("name");
   const [error, setError] = useState<string | null>(null);
+  const [inputFocused, setInputFocused] = useState(false);
 
   const handleCreateAccount = async () => {
     if (!name.trim()) return;
@@ -91,181 +150,160 @@ export function Login() {
 
   if (isPending) {
     return (
-      <ThemeProvider theme={theme}>
-        <Box
-          sx={{
-            minHeight: "100vh",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            bgcolor: "background.default",
-          }}
-        >
-          <CircularProgress />
-        </Box>
-      </ThemeProvider>
+      <div style={pageContainer}>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+        <div style={spinner} />
+      </div>
     );
   }
 
   if (session?.user) {
     return (
-      <ThemeProvider theme={theme}>
-        <Box
-          sx={{
-            minHeight: "100vh",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            bgcolor: "background.default",
-          }}
-        >
-          <Container maxWidth="xs">
-            <Paper elevation={3} sx={{ p: 4, textAlign: "center" }}>
-              <Box
-                sx={{
-                  width: 64,
-                  height: 64,
-                  borderRadius: "50%",
-                  bgcolor: `${colors.success}20`,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  mx: "auto",
-                  mb: 3,
-                }}
-              >
-                <Check size={32} color={colors.success} />
-              </Box>
-              <Typography variant="h5" gutterBottom>
-                Welcome back!
-              </Typography>
-              <Typography color="text.secondary" sx={{ mb: 4 }}>
-                Signed in as{" "}
-                <strong>{session.user.name || session.user.email}</strong>
-              </Typography>
-              <Button
-                variant="outlined"
-                color="secondary"
-                startIcon={<LogOut size={18} />}
-                onClick={handleSignOut}
-                fullWidth
-                size="large"
-              >
-                Sign out
-              </Button>
-            </Paper>
-          </Container>
-        </Box>
-      </ThemeProvider>
+      <div style={pageContainer}>
+        <div style={{ ...card, textAlign: "center" }}>
+          <div
+            style={{
+              ...successCircle,
+              margin: "0 auto 24px",
+            }}
+          >
+            <Check size={32} color={colors.success} />
+          </div>
+          <h2
+            style={{
+              fontSize: 24,
+              fontWeight: 600,
+              marginBottom: 8,
+              color: colors.textPrimary,
+            }}
+          >
+            Welcome back!
+          </h2>
+          <p
+            style={{
+              color: colors.textSecondary,
+              marginBottom: 32,
+              fontSize: 16,
+            }}
+          >
+            Signed in as <strong>{session.user.name || session.user.email}</strong>
+          </p>
+          <button onClick={handleSignOut} style={secondaryButton}>
+            <LogOut size={18} />
+            Sign out
+          </button>
+        </div>
+      </div>
     );
   }
 
   return (
-    <ThemeProvider theme={theme}>
-      <Box
-        sx={{
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          bgcolor: "background.default",
-        }}
-      >
-        <Container maxWidth="xs">
-          <Paper elevation={3} sx={{ p: 4 }}>
-            {step === "creating" && (
-              <>
-                <Typography variant="h5" gutterBottom>
-                  Unlock Passkey...
-                </Typography>
-              </>
-            )}
+    <div style={pageContainer}>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      <div style={card}>
+        {step === "creating" && (
+          <h2
+            style={{
+              fontSize: 24,
+              fontWeight: 600,
+              marginBottom: 16,
+              color: colors.textPrimary,
+            }}
+          >
+            Unlock Passkey...
+          </h2>
+        )}
 
-            {step === "done" && (
-              <>
-                <Typography variant="h5" gutterBottom>
-                  You're all set!
-                </Typography>
-                <Typography color="text.secondary" sx={{ mb: 3 }}>
-                  Your account is ready
-                </Typography>
-              </>
-            )}
+        {step === "done" && (
+          <>
+            <h2
+              style={{
+                fontSize: 24,
+                fontWeight: 600,
+                marginBottom: 8,
+                color: colors.textPrimary,
+              }}
+            >
+              You're all set!
+            </h2>
+            <p
+              style={{
+                color: colors.textSecondary,
+                marginBottom: 24,
+                fontSize: 16,
+              }}
+            >
+              Your account is ready
+            </p>
+          </>
+        )}
 
-            {error && (
-              <Alert severity="error" sx={{ mb: 3 }}>
-                {error}
-              </Alert>
-            )}
+        {error && <div style={alertError}>{error}</div>}
 
-            {step === "name" && (
-              <Stack spacing={2}>
-                <TextField
-                  label="Your name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleCreateAccount()}
-                  fullWidth
-                  autoFocus
-                />
-                <Button
-                  variant="contained"
-                  onClick={handleCreateAccount}
-                  disabled={!name.trim()}
-                  fullWidth
-                  size="large"
-                >
-                  Sign up
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  startIcon={<Fingerprint size={20} />}
-                  onClick={handleSignInWithPasskey}
-                  fullWidth
-                  size="large"
-                >
-                  Sign in with passkey
-                </Button>
-              </Stack>
-            )}
+        {step === "name" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <Input
+              placeholder="Your name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleCreateAccount()}
+              onFocus={() => setInputFocused(true)}
+              onBlur={() => setInputFocused(false)}
+              autoFocus
+              style={{
+                ...inputStyle,
+                borderColor: inputFocused ? colors.primary : "#ddd",
+              }}
+            />
+            <button
+              onClick={handleCreateAccount}
+              disabled={!name.trim()}
+              style={{
+                ...primaryButton,
+                opacity: !name.trim() ? 0.5 : 1,
+                cursor: !name.trim() ? "not-allowed" : "pointer",
+              }}
+            >
+              Sign up
+            </button>
+            <button onClick={handleSignInWithPasskey} style={secondaryButton}>
+              <Fingerprint size={20} />
+              Sign in with passkey
+            </button>
+          </div>
+        )}
 
-            {step === "creating" && (
-              <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-                <CircularProgress />
-              </Box>
-            )}
+        {step === "creating" && (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              padding: "32px 0",
+            }}
+          >
+            <div style={spinner} />
+          </div>
+        )}
 
-            {step === "done" && (
-              <Stack spacing={2} alignItems="center">
-                <Box
-                  sx={{
-                    width: 72,
-                    height: 72,
-                    borderRadius: "50%",
-                    bgcolor: `${colors.success}20`,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Check size={36} color={colors.success} />
-                </Box>
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  startIcon={<LogOut size={18} />}
-                  onClick={handleSignOut}
-                  fullWidth
-                  size="large"
-                >
-                  Sign out
-                </Button>
-              </Stack>
-            )}
-          </Paper>
-        </Container>
-      </Box>
-    </ThemeProvider>
+        {step === "done" && (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 16,
+            }}
+          >
+            <div style={{ ...successCircle, width: 72, height: 72 }}>
+              <Check size={36} color={colors.success} />
+            </div>
+            <button onClick={handleSignOut} style={secondaryButton}>
+              <LogOut size={18} />
+              Sign out
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
