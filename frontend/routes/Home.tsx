@@ -3,6 +3,7 @@ import { hc } from "hono/client";
 import { useState } from "react";
 import { CornerDownLeft } from "lucide-react";
 import { Link } from "@tanstack/react-router";
+import { colors, shadows } from "../styles";
 
 const client = hc<App>("/api");
 
@@ -47,7 +48,7 @@ export function Home() {
         flexDirection: "column",
         alignItems: "center",
         minHeight: "100vh",
-        background: "#fdf6ed",
+        background: colors.background,
         position: "relative",
       }}
     >
@@ -57,7 +58,7 @@ export function Home() {
           position: "absolute",
           top: "24px",
           right: "24px",
-          color: "rgb(26, 26, 26)",
+          color: colors.textPrimary,
           textDecoration: "none",
           fontSize: "16px",
           fontWeight: 500,
@@ -73,7 +74,7 @@ export function Home() {
           gap: "10px",
           fontSize: "48px",
           fontWeight: "bold",
-          color: "rgb(248, 145, 37)",
+          color: colors.primary,
         }}
       >
         <span>Hello,</span>
@@ -86,7 +87,7 @@ export function Home() {
           style={{
             fontSize: "48px",
             fontWeight: "bold",
-            color: "rgb(26, 26, 26)",
+            color: colors.textPrimary,
             caretColor: "black",
             caretShape: "block",
             border: "none",
@@ -112,7 +113,7 @@ export function Home() {
               opacity: loading ? 0.5 : 1,
             }}
           >
-            <CornerDownLeft size={32} color="rgb(26, 26, 26)" />
+            <CornerDownLeft size={32} color={colors.textPrimary} />
           </button>
         )}
       </div>
@@ -121,9 +122,9 @@ export function Home() {
           style={{
             marginTop: "40px",
             padding: "18px 26px",
-            background: "#1a1a1a",
+            background: colors.darkSurface,
             borderRadius: "9px",
-            boxShadow: "0 4px 13px rgba(0,0,0,0.1)",
+            boxShadow: shadows.card,
             display: "flex",
             alignItems: "center",
             gap: "18px",
@@ -132,7 +133,7 @@ export function Home() {
         >
           <span
             style={{
-              color: "#888",
+              color: colors.textMuted,
               fontSize: "15px",
             }}
           >
@@ -140,7 +141,7 @@ export function Home() {
           </span>
           <span
             style={{
-              color: "#f8f8f8",
+              color: colors.darkText,
               fontSize: "15px",
             }}
           >
