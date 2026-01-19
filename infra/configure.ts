@@ -4,37 +4,10 @@
  */
 
 import { execSync } from "child_process";
-import * as readline from "readline";
 import * as fs from "fs";
 import * as crypto from "crypto";
 import { createCloudflareApi } from "alchemy/cloudflare";
-
-function prompt(question: string, options?: string[]): Promise<string> {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-
-  if (options) {
-    console.log(question);
-    options.forEach((opt, i) => console.log(`  ${i + 1}. ${opt}`));
-    question = "Enter number: ";
-  }
-
-  return new Promise((resolve) => {
-    rl.question(question, (answer) => {
-      rl.close();
-      if (options) {
-        const index = parseInt(answer, 10) - 1;
-        resolve(
-          index >= 0 && index < options.length ? options[index] : options[0],
-        );
-      } else {
-        resolve(answer);
-      }
-    });
-  });
-}
+import { intro, outro, select, text, isCancel, log } from "@clack/prompts";
 
 // Prompts user to select or enter a domain
 async function getDomain(): Promise<string> {
@@ -43,32 +16,53 @@ async function getDomain(): Promise<string> {
   const data = (await response.json()) as { result: { name: string }[] };
   const zones = data.result.map((z) => z.name);
 
-  const options = [...zones, "Other (enter manually)"];
-  const selected = await prompt("Select a domain:", options);
+  const options = [
+    ...zones.map((z) => ({ value: z, label: z })),
+    { value: "__other__", label: "Other (enter manually)" },
+  ];
+
+  const selected = await select({
+    message: "Select a domain:",
+    options,
+  });
+
+  if (isCancel(selected)) {
+    log.error("Configuration cancelled.");
+    process.exit(1);
+  }
 
   let domain: string;
-  if (selected === "Other (enter manually)") {
-    domain = await prompt("Enter your domain: ");
+  if (selected === "__other__") {
+    const entered = await text({ message: "Enter your domain:" });
+    if (isCancel(entered)) {
+      log.error("Configuration cancelled.");
+      process.exit(1);
+    }
+    domain = entered;
   } else {
     domain = selected;
   }
 
-  const subdomainOptions = ["None (use root domain)", "Enter subdomain"];
-  const subdomainChoice = await prompt("Subdomain?", subdomainOptions);
+  const subdomain = await text({
+    message: "Enter subdomain (or press Enter for root domain):",
+    placeholder: "e.g. app, www, api",
+  });
 
-  if (subdomainChoice === "Enter subdomain") {
-    const subdomain = await prompt("Enter subdomain (without the domain): ");
-    return `${subdomain}.${domain}`;
+  if (isCancel(subdomain)) {
+    log.error("Configuration cancelled.");
+    process.exit(1);
   }
 
-  return domain;
+  return subdomain ? `${subdomain}.${domain}` : domain;
 }
+
+intro("Project Configuration");
 
 // Run bunx alchemy configure
 try {
   execSync("bunx alchemy configure", { stdio: "inherit" });
 } catch {
-  console.log("Alchemy configuration cancelled or failed.");
+  log.error("Alchemy configuration cancelled or failed.");
   process.exit(1);
 }
 
@@ -85,9 +79,8 @@ const alchemyPassword = crypto
 // Fail if .env already exists
 const envPath = ".env";
 if (fs.existsSync(envPath)) {
-  throw new Error(
-    ".env file already exists. This repo may have already been configured.",
-  );
+  log.error(".env file already exists. This repo may have already been configured.");
+  process.exit(1);
 }
 
 // Write .env file
@@ -101,6 +94,4 @@ const envContent =
     .join("\n") + "\n";
 fs.writeFileSync(envPath, envContent);
 
-console.log("\n✓ Configuration complete!");
-console.log(`  Domain: ${domain}`);
-console.log(`  Alchemy password has been generated and saved to .env`);
+outro(`Configuration complete! Domain: ${domain}`);
