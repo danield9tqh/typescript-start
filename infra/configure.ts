@@ -7,7 +7,8 @@ import { execSync } from "child_process";
 import * as fs from "fs";
 import * as crypto from "crypto";
 import { createCloudflareApi } from "alchemy/cloudflare";
-import { intro, outro, select, text, isCancel, log } from "@clack/prompts";
+import { outro, select, text, isCancel, log } from "@clack/prompts";
+import pkg from "../package.json" assert { type: "json" };
 
 // Prompts user to select or enter a domain
 async function getDomain(): Promise<string> {
@@ -44,8 +45,8 @@ async function getDomain(): Promise<string> {
   }
 
   const subdomain = await text({
-    message: "Enter subdomain (or press Enter for root domain):",
-    placeholder: "e.g. app, www, api",
+    message: "Enter subdomain (or press Enter for no subdomain):",
+    placeholder: `e.g. ${pkg.name} app, api`,
   });
 
   if (isCancel(subdomain)) {
@@ -55,8 +56,6 @@ async function getDomain(): Promise<string> {
 
   return subdomain ? `${subdomain}.${domain}` : domain;
 }
-
-intro("Project Configuration");
 
 // Run bunx alchemy configure
 try {
