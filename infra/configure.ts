@@ -12,7 +12,7 @@ import { intro, outro, select, text, isCancel, log } from "@clack/prompts";
 // Prompts user to select or enter a domain
 async function getDomain(): Promise<string> {
   const api = await createCloudflareApi({});
-  const response = await api.get("/zones?per_page=50");
+  const response = await api.get("/zones?per_page=10");
   const data = (await response.json()) as { result: { name: string }[] };
   const zones = data.result.map((z) => z.name);
 
@@ -79,7 +79,9 @@ const alchemyPassword = crypto
 // Fail if .env already exists
 const envPath = ".env";
 if (fs.existsSync(envPath)) {
-  log.error(".env file already exists. This repo may have already been configured.");
+  log.error(
+    ".env file already exists. This repo may have already been configured.",
+  );
   process.exit(1);
 }
 
