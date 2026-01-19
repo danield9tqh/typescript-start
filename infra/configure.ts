@@ -1,28 +1,80 @@
+/**
+ * This file is for initial project configuration only.
+ * It can be safely removed after running `bun run infra/configure.ts`.
+ */
+
 import { execSync } from "child_process";
 import * as readline from "readline";
 import * as fs from "fs";
 import * as crypto from "crypto";
+import { createCloudflareApi } from "alchemy/cloudflare";
 
-function prompt(question: string): Promise<string> {
+function prompt(question: string, options?: string[]): Promise<string> {
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
   });
 
+  if (options) {
+    console.log(question);
+    options.forEach((opt, i) => console.log(`  ${i + 1}. ${opt}`));
+    question = "Enter number: ";
+  }
+
   return new Promise((resolve) => {
     rl.question(question, (answer) => {
       rl.close();
-      resolve(answer);
+      if (options) {
+        const index = parseInt(answer, 10) - 1;
+        resolve(
+          index >= 0 && index < options.length ? options[index] : options[0],
+        );
+      } else {
+        resolve(answer);
+      }
     });
   });
 }
 
+// Prompts user to select or enter a domain
+async function getDomain(): Promise<string> {
+  const api = await createCloudflareApi({});
+  const response = await api.get("/zones?per_page=50");
+  const data = (await response.json()) as { result: { name: string }[] };
+  const zones = data.result.map((z) => z.name);
+
+  const options = [...zones, "Other (enter manually)"];
+  const selected = await prompt("Select a domain:", options);
+
+  let domain: string;
+  if (selected === "Other (enter manually)") {
+    domain = await prompt("Enter your domain: ");
+  } else {
+    domain = selected;
+  }
+
+  const subdomainOptions = ["None (use root domain)", "Enter subdomain"];
+  const subdomainChoice = await prompt("Subdomain?", subdomainOptions);
+
+  if (subdomainChoice === "Enter subdomain") {
+    const subdomain = await prompt("Enter subdomain (without the domain): ");
+    return `${subdomain}.${domain}`;
+  }
+
+  return domain;
+}
+
 // Run bunx alchemy configure
 console.log("Running alchemy configure...");
-execSync("bunx alchemy configure", { stdio: "inherit" });
+try {
+  execSync("bunx alchemy configure", { stdio: "inherit" });
+} catch {
+  console.log("Alchemy configuration cancelled or failed.");
+  process.exit(1);
+}
 
-// Ask for Cloudflare domain
-const domain = await prompt("Enter your Cloudflare domain to deploy to: ");
+// Get domain from Cloudflare zones
+const domain = await getDomain();
 
 // Generate a random hashed string for the alchemy password
 const randomBytes = crypto.randomBytes(32);
