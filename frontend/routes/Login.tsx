@@ -1,5 +1,6 @@
 import { useState, type CSSProperties } from "react";
 import { Input } from "@base-ui-components/react/input";
+import { Button } from "@base-ui-components/react/button";
 import { Fingerprint, LogOut, Check } from "lucide-react";
 import { anonymousClient } from "better-auth/client/plugins";
 import { passkeyClient } from "@better-auth/passkey/client";
@@ -24,7 +25,6 @@ const inputStyle: CSSProperties = {
   outline: "none",
   boxSizing: "border-box",
 };
-
 
 const buttonBase: CSSProperties = {
   width: "100%",
@@ -186,12 +186,13 @@ export function Login() {
               fontSize: 16,
             }}
           >
-            Signed in as <strong>{session.user.name || session.user.email}</strong>
+            Signed in as{" "}
+            <strong>{session.user.name || session.user.email}</strong>
           </p>
-          <button onClick={handleSignOut} style={secondaryButton}>
+          <Button onClick={handleSignOut} style={secondaryButton}>
             <LogOut size={18} />
             Sign out
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -255,7 +256,7 @@ export function Login() {
                 borderColor: inputFocused ? colors.primary : "#ddd",
               }}
             />
-            <button
+            <Button
               onClick={handleCreateAccount}
               disabled={!name.trim()}
               style={{
@@ -265,11 +266,11 @@ export function Login() {
               }}
             >
               Sign up
-            </button>
-            <button onClick={handleSignInWithPasskey} style={secondaryButton}>
+            </Button>
+            <Button onClick={handleSignInWithPasskey} style={secondaryButton}>
               <Fingerprint size={20} />
               Sign in with passkey
-            </button>
+            </Button>
           </div>
         )}
 
@@ -297,10 +298,10 @@ export function Login() {
             <div style={{ ...successCircle, width: 72, height: 72 }}>
               <Check size={36} color={colors.success} />
             </div>
-            <button onClick={handleSignOut} style={secondaryButton}>
+            <Button onClick={handleSignOut} style={secondaryButton}>
               <LogOut size={18} />
               Sign out
-            </button>
+            </Button>
           </div>
         )}
       </div>
